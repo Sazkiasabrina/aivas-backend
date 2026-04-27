@@ -1,22 +1,10 @@
-// app/api/delivery-order/route.ts
-
 import { NextResponse } from 'next/server'
 import { supabase } from '../../../lib/supabase'
 
 export async function GET() {
   const { data, error } = await supabase
-    .from('delivery_order')
-    .select(`
-      *,
-      vendor (
-        id,
-        name
-      ),
-      purchase_order (
-        id,
-        po_number
-      )
-    `)
+    .from('vendor')
+    .select('*')
 
   if (error) {
     return NextResponse.json(
@@ -32,16 +20,14 @@ export async function POST(req: Request) {
   const body = await req.json()
 
   const { data, error } = await supabase
-    .from('delivery_order')
+    .from('vendor')
     .insert([
       {
-        do_number: body.do_number,
-        purchase_order_id: body.purchase_order_id,
-        vendor_id: body.vendor_id,
-        status: body.status || 'shipped',
-        shipped_at: new Date(),
-        carrier: body.carrier,
-        tracking_number: body.tracking_number
+        name: body.name,
+        contact_info: body.contact_info,
+        address: body.address,
+        phone: body.phone,
+        status: body.status || 'active'
       }
     ])
     .select()
@@ -54,7 +40,7 @@ export async function POST(req: Request) {
   }
 
   return NextResponse.json({
-    message: 'Delivery Order berhasil dibuat',
+    message: 'Vendor berhasil dibuat',
     data
   })
 }

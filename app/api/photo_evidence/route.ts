@@ -1,20 +1,17 @@
-// app/api/delivery-order/route.ts
+// app/api/photo-evidence/route.ts
 
 import { NextResponse } from 'next/server'
 import { supabase } from '../../../lib/supabase'
 
 export async function GET() {
   const { data, error } = await supabase
-    .from('delivery_order')
+    .from('photo_evidence')
     .select(`
       *,
-      vendor (
+      inbound_scan (
         id,
-        name
-      ),
-      purchase_order (
-        id,
-        po_number
+        qty_actual,
+        status
       )
     `)
 
@@ -32,16 +29,14 @@ export async function POST(req: Request) {
   const body = await req.json()
 
   const { data, error } = await supabase
-    .from('delivery_order')
+    .from('photo_evidence')
     .insert([
       {
-        do_number: body.do_number,
-        purchase_order_id: body.purchase_order_id,
-        vendor_id: body.vendor_id,
-        status: body.status || 'shipped',
-        shipped_at: new Date(),
-        carrier: body.carrier,
-        tracking_number: body.tracking_number
+        inbound_scan_id: body.inbound_scan_id,
+        url: body.url,
+        timestamp: new Date(),
+        mime_type: body.mime_type,
+        thumbnail_url: body.thumbnail_url
       }
     ])
     .select()
@@ -54,7 +49,7 @@ export async function POST(req: Request) {
   }
 
   return NextResponse.json({
-    message: 'Delivery Order berhasil dibuat',
+    message: 'Photo Evidence berhasil dibuat',
     data
   })
 }
